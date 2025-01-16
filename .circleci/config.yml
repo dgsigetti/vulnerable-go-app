@@ -26,16 +26,16 @@ jobs:
   wizcli_scan:
     working_directory: ~/app
     docker:
-      - image: docker:20.10.16 # Use a Docker-enabled image for pulling and scanning
+      - image: cimg/node:17.2.0 # Use a Docker-enabled image for pulling and scanning
     steps:
       - setup_remote_docker # Enable Docker-in-Docker for image scanning
       - checkout
       - run:
           name: Download Wiz CLI
           command: |
-            mkdir -p /wizcli
-            curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
-            chmod +x ./wizcli
+            sudo mkdir -p /wizcli
+            sudo curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
+            sudo chmod +x ./wizcli
       - run:
           name: Authenticate to Wiz
           command: ./wizcli auth --id ${cromd7btaned7jpdpist4nqsp3c72kqq72cvreuwrgrzh24srmdgs} --secret ${agswrKs7fLfImAGKeRQDhsT9hEVu06yIMZFnysgz8NJvt0TxVfSU7x3EwgTiv9L9}
