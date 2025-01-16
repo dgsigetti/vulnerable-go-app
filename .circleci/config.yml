@@ -1,0 +1,41 @@
+version: 2.1
+
+executors:
+  go-executor:
+    docker:
+      - image: cimg/go:1.20 # Use the Go 1.20 image
+
+jobs:
+  build-and-test:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: go mod tidy
+      - run:
+          name: Run Tests
+          command: go test ./...
+
+  deploy:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t vulnerable-go-app .
+      - run:
+          name: Deploy Docker Container
+          command: |
+            docker run -d -p 8080:8080 vulnerable-go-app
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-and-test
+      - deploy:
+          requires:
+            - build-and-test
+
