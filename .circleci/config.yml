@@ -33,9 +33,9 @@ jobs:
       - run:
           name: Download Wiz CLI
           command: |
-            sudo mkdir -p /wizcli
-            sudo curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
-            sudo chmod +x ./wizcli
+            mkdir -p /wizcli
+            curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
+            chmod +x ./wizcli
       - run:
           name: Authenticate to Wiz
           command: ./wizcli auth --id ${cromd7btaned7jpdpist4nqsp3c72kqq72cvreuwrgrzh24srmdgs} --secret ${agswrKs7fLfImAGKeRQDhsT9hEVu06yIMZFnysgz8NJvt0TxVfSU7x3EwgTiv9L9}
