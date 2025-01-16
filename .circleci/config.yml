@@ -15,27 +15,20 @@ jobs:
 
   docker-build:
     docker:
-      - image: docker:20.10.16 # Docker image
+      - image: docker:20.10.16 # Docker-enabled image
     steps:
       - checkout
       - setup_remote_docker
       - run:
           name: Build Docker Image
-          command: docker build -t vulnerable-go-app .
+          command: docker build -t vulnerable-go-app:latest .
 
   wizcli_scan:
     working_directory: ~/app
     docker:
-      - image: cimg/node:17.2.0 # Node image required for Wiz CLI
-    parameters:
-        image:
-          type: string
-          default: "nginx:latest" # Default pre-built image to scan
-        policy:
-          type: string
-          default: "Default vulnerabilities policy" # Wiz CI policy
+      - image: docker:20.10.16 # Use a Docker-enabled image for pulling and scanning
     steps:
-      - setup_remote_docker
+      - setup_remote_docker # Enable Docker-in-Docker for image scanning
       - checkout
       - run:
           name: Download Wiz CLI
@@ -45,12 +38,12 @@ jobs:
             sudo chmod +x ./wizcli
       - run:
           name: Authenticate to Wiz
-          command: ./wizcli auth --id ${WIZCLI_ID} --secret ${WIZCLI_SECRET}
+          command: ./wizcli auth --id ${cromd7btaned7jpdpist4nqsp3c72kqq72cvreuwrgrzh24srmdgs} --secret ${agswrKs7fLfImAGKeRQDhsT9hEVu06yIMZFnysgz8NJvt0TxVfSU7x3EwgTiv9L9}
       - run:
           name: Scan Docker Image
           command: |
-            docker pull << parameters.image >>
-            ./wizcli docker scan --image << parameters.image >> --policy "<< parameters.policy >>"
+            docker pull vulnerable-go-app:latest
+            ./wizcli docker scan --image vulnerable-go-app:latest --policy "Default vulnerabilities policy"
 
 workflows:
   version: 2
@@ -63,6 +56,3 @@ workflows:
       - wizcli_scan:
           requires:
             - docker-build
-          image: "vulnerable-go-app:latest" # Pass the built image as a parameter
-          policy: "Default vulnerabilities policy"
-
