@@ -1,0 +1,6 @@
+# Ignore build files and dependencies
+bin/
+obj/
+*.exe
+*.log
+
