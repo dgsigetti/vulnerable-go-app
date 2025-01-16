@@ -1,13 +1,9 @@
 version: 2.1
 
-executors:
-  go-executor:
-    docker:
-      - image: cimg/go:1.20 # Use the Go 1.20 image
-
 jobs:
   build-and-test:
-    executor: go-executor
+    docker:
+      - image: cimg/go:1.20 # Use the Go 1.20 image
     steps:
       - checkout
       - run:
@@ -17,25 +13,23 @@ jobs:
           name: Run Tests
           command: go test ./...
 
-  deploy:
-    executor: go-executor
+  docker-build:
+    docker:
+      - image: docker:20.10.16 # Docker-enabled image
     steps:
       - checkout
+      - setup_remote_docker: # Enable Docker-in-Docker
+          version: 20.10.16
       - run:
           name: Build Docker Image
-          command: |
-            docker build -t vulnerable-go-app .
-      - run:
-          name: Deploy Docker Container
-          command: |
-            docker run -d -p 8080:8080 vulnerable-go-app
+          command: docker build -t vulnerable-go-app .
 
 workflows:
   version: 2
   build-and-deploy:
     jobs:
       - build-and-test
-      - deploy:
+      - docker-build:
           requires:
             - build-and-test
 
