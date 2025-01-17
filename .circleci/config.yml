@@ -22,9 +22,15 @@ jobs:
     docker:
       - image: docker:20.10.16
     steps:
-      - setup_remote_docker	
+      - setup_remote_docker
       - attach_workspace:
           at: /workspace
+      - run:
+          name: Download Wiz CLI
+          command: |
+            sudo mkdir -p /wizcli
+            sudo curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
+            sudo chmod +x ./wizcli
       - run:
           name: Load Docker Image from Tarball
           command: docker load -i /workspace/vulnerable-go-app.tar
