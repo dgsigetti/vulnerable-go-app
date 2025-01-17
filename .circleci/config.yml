@@ -38,7 +38,7 @@ jobs:
             sudo chmod +x ./wizcli
       - run:
           name: Authenticate to Wiz
-          command: ./wizcli auth --id ${cromd7btaned7jpdpist4nqsp3c72kqq72cvreuwrgrzh24srmdgs} --secret ${agswrKs7fLfImAGKeRQDhsT9hEVu06yIMZFnysgz8NJvt0TxVfSU7x3EwgTiv9L9}
+          command: ./wizcli auth --id "${cromd7btaned7jpdpist4nqsp3c72kqq72cvreuwrgrzh24srmdgs}" --secret "${agswrKs7fLfImAGKeRQDhsT9hEVu06yIMZFnysgz8NJvt0TxVfSU7x3EwgTiv9L9}"
       - run:
           name: Scan Docker Image
           command: |
