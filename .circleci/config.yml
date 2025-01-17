@@ -3,14 +3,14 @@ version: 2.1
 jobs:
   docker-build:
     docker:
-      - image: docker:20.10.16
+      - image: docker:20.10.16 # Docker-enabled image
     steps:
       - checkout
       - setup_remote_docker
       - run:
           name: Build Docker Image
           command: docker build -t vulnerable-go-app:latest .
-      - run:
+      - run: 
           name: Save Docker Image as Tarball
           command: |
             mkdir -p /workspace
@@ -51,4 +51,3 @@ workflows:
       - wizcli_scan:
           requires:
             - docker-build
-
