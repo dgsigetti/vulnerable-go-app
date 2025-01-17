@@ -13,10 +13,10 @@ jobs:
       - run: 
           name: Save Docker Image as Tarball
           command: |
-            mkdir -p /workspace
-            docker save vulnerable-go-app:latest -o /workspace/vulnerable-go-app.tar
+            mkdir -p /tmp/workspace
+            docker save vulnerable-go-app:latest -o /tmp/workspace/vulnerable-go-app.tar
       - persist_to_workspace:
-          root: /workspace
+          root: /tmp/workspace
           paths:
             - vulnerable-go-app.tar
 
@@ -26,7 +26,10 @@ jobs:
     steps:
       - setup_remote_docker
       - attach_workspace:
-          at: /workspace
+          at: /tmp/workspace
+      - run:
+          name: Debug Workspace in wizcli_scan
+          command: ls -l /tmp/workspace
       - run:
           name: Download Wiz CLI
           command: |
@@ -35,7 +38,7 @@ jobs:
             sudo chmod +x ./wizcli
       - run:
           name: Load Docker Image from Tarball
-          command: docker load -i /workspace/vulnerable-go-app.tar
+          command: docker load -i /tmp/workspace/vulnerable-go-app.tar
       - run:
           name: Authenticate with Wiz
           command: WIZ_ENV=test ./wizcli auth --id "${WIZCLI_ID}" --secret "${WIZCLI_SECRET}"
