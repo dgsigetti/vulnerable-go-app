@@ -10,7 +10,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: docker build -t vulnerable-go-app:latest .
-      - run:
+      - run: 
           name: Save Docker Image as Tarball
           command: |
             mkdir -p /tmp/workspace
@@ -37,10 +37,14 @@ jobs:
             sudo curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
             sudo chmod +x ./wizcli
       - run:
-          name: Authenticate and Scan with Wiz
-          command: |
-            WIZ_ENV=test ./wizcli auth --id "${WIZCLI_ID}" --secret "${WIZCLI_SECRET}" &&
-            ./wizcli docker scan --image vulnerable-go-app:latest --policy "Default vulnerabilities policy"
+          name: Load Docker Image from Tarball
+          command: docker load -i /tmp/workspace/vulnerable-go-app.tar
+      - run:
+          name: Authenticate with Wiz
+          command: WIZ_ENV=test ./wizcli auth --id "${WIZCLI_ID}" --secret "${WIZCLI_SECRET}"
+      - run:
+          name: Scan Docker Image
+          command: WIZ_ENV=test ./wizcli docker scan --image vulnerable-go-app:latest --policy "Default vulnerabilities policy"
 
 workflows:
   version: 2
@@ -50,4 +54,3 @@ workflows:
       - wizcli_scan:
           requires:
             - docker-build
-
