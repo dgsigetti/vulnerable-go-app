@@ -12,9 +12,11 @@ jobs:
           command: docker build -t vulnerable-go-app:latest .
       - run:
           name: Save Docker Image as Tarball
-          command: docker save vulnerable-go-app:latest -o vulnerable-go-app.tar
+          command: |
+            mkdir -p /workspace
+            docker save vulnerable-go-app:latest -o /workspace/vulnerable-go-app.tar
       - persist_to_workspace:
-          root: .
+          root: /workspace
           paths:
             - vulnerable-go-app.tar
 
