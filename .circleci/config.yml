@@ -20,7 +20,7 @@ jobs:
 
   wizcli_scan:
     docker:
-      - image: docker:20.10.16
+      - image: cimg/base:stable
     steps:
       - setup_remote_docker
       - attach_workspace:
@@ -49,3 +49,4 @@ workflows:
       - wizcli_scan:
           requires:
             - docker-build
+
