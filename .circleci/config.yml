@@ -41,7 +41,7 @@ jobs:
           command: docker load -i /tmp/workspace/vulnerable-go-app.tar
       - run:
           name: Authenticate with Wiz
-          commane: |		
+          command: |		
             WIZ_ENV=test ./wizcli auth --id "${WIZCLI_ID}" --secret "${WIZCLI_SECRET}"
             ./wizcli docker scan --image vulnerable-go-app:latest --policy "Default vulnerabilities policy"
 
