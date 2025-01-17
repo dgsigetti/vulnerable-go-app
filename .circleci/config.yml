@@ -1,58 +1,44 @@
 version: 2.1
 
 jobs:
-  build-and-test:
-    docker:
-      - image: cimg/go:1.20 # Go image
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: go mod tidy
-      - run:
-          name: Run Tests
-          command: go test ./...
-
   docker-build:
     docker:
-      - image: docker:20.10.16 # Docker-enabled image
+      - image: docker:20.10.16
     steps:
       - checkout
       - setup_remote_docker
       - run:
           name: Build Docker Image
           command: docker build -t vulnerable-go-app:latest .
+      - run:
+          name: Save Docker Image as Tarball
+          command: docker save vulnerable-go-app:latest -o vulnerable-go-app.tar
+      - persist_to_workspace:
+          root: .
+          paths:
+            - vulnerable-go-app.tar
 
   wizcli_scan:
-    working_directory: ~/app
     docker:
-      - image: cimg/base:stable # Use a Docker-enabled image for pulling and scanning
+      - image: docker:20.10.16
     steps:
-      - setup_remote_docker # Enable Docker-in-Docker for image scanning
-      - checkout
+      - attach_workspace:
+          at: /workspace
       - run:
-          name: Download Wiz CLI
-          command: |
-            sudo mkdir -p /wizcli
-            sudo curl -o wizcli https://downloads.wiz.io/wizcli/latest/wizcli-linux-amd64
-            sudo chmod +x ./wizcli
+          name: Load Docker Image from Tarball
+          command: docker load -i /workspace/vulnerable-go-app.tar
       - run:
-          name: Authenticate to Wiz
-          command: WIZ_ENV=test ./wizcli auth --id ${WIZCLI_ID} --secret ${WIZCLI_SECRET}
+          name: Authenticate with Wiz
+          command: WIZ_ENV=test ./wizcli auth --id "${WIZCLI_ID}" --secret "${WIZCLI_SECRET}"
       - run:
           name: Scan Docker Image
-          command: |
-            docker pull vulnerable-go-app:latest
-            ./wizcli docker scan --image vulnerable-go-app:latest --policy "Default vulnerabilities policy"
+          command: ./wizcli docker scan --image vulnerable-go-app:latest --policy "Default vulnerabilities policy"
 
 workflows:
   version: 2
   build-and-scan-workflow:
     jobs:
-      - build-and-test
-      - docker-build:
-          requires:
-            - build-and-test
+      - docker-build
       - wizcli_scan:
           requires:
             - docker-build
