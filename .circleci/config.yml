@@ -38,7 +38,7 @@ jobs:
             sudo chmod +x ./wizcli
       - run:
           name: Authenticate to Wiz
-          command: ./wizcli auth --id ${WIZCLI_ID} --secret ${WIZCLI_SECRET}
+          command: ./wizcli auth --id ${WIZCLI_ID} --secret ${WIZCLI_SECRET} --url "https://api.eu1.test.wiz.io/graphql"
       - run:
           name: Scan Docker Image
           command: |
